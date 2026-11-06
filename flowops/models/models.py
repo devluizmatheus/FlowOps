@@ -64,3 +64,46 @@ class Users(TimestampMixin, ActiveMixin):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
 
+
+@mapped_as_dataclass(registry=table_registry)
+class managements_responsibilities:
+
+    __tablename__ = "managements_responsibilities"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    management_id: Mapped[int] = mapped_column(ForeignKey("managements.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+
+@mapped_as_dataclass(registry=table_registry)
+class submanagements_responsibilities:
+
+    __tablename__ = "submanagements_responsibilities"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    submanagement_id: Mapped[int] = mapped_column(ForeignKey("submanagements.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+@mapped_as_dataclass(registry=table_registry)
+class teams_responsibilities:
+
+    __tablename__ = "teams_responsabilities"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+@mapped_as_dataclass(registry=table_registry)
+class organization_directorships:
+
+    __tablename__ = "organization_directorships"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
