@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 
 from sqlalchemy import (
     BigInteger,
@@ -16,6 +17,8 @@ from sqlalchemy import (
 
 from sqlalchemy.orm import Mapped, mapped_as_dataclass, mapped_column, registry
 
+from sqlalchemy import Enum as SQLEnum
+
 from flowops.models.models_mixins import ActiveMixin, TimestampMixin
 
 
@@ -28,6 +31,7 @@ class Organizations(TimestampMixin, ActiveMixin):
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, default=None)
 
 
 @mapped_as_dataclass(table_registry)
@@ -44,6 +48,7 @@ class Managements:
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"), nullable=False)
     name : Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, default=None)
 
     __table_args__ = (
         UniqueConstraint(
@@ -60,6 +65,7 @@ class Submanagements:
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     management_id: Mapped[int] = mapped_column(ForeignKey("managements.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, default=None)
 
     __table_args__ = (
         UniqueConstraint(
@@ -77,6 +83,7 @@ class Teams:
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     management_id: Mapped[int] = mapped_column(ForeignKey("managements.id"), nullable=True)
     submanagement_id: Mapped[int | None] = mapped_column(ForeignKey("submanagements.id"), default=None)
+    description: Mapped[str | None] = mapped_column(Text, default=None)
 
     __table_args__ = (
         UniqueConstraint(
@@ -155,6 +162,19 @@ class OrganizationDirectorships:
         ),
     )
 
+class TaskStatus(str, Enum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    IN_REVIEW = "in_review"
+    DONE = "done"
+
+
+class TaskPriority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
 @mapped_as_dataclass(table_registry)
 class Tasks(TimestampMixin):
 
@@ -163,11 +183,28 @@ class Tasks(TimestampMixin):
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"), nullable=False)
     management_id: Mapped[int] = mapped_column(ForeignKey("managements.id"), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    status: Mapped[str] = mapped_column(String(30), nullable=False)
-    priority: Mapped[str] = mapped_column(String(20), nullable=False)
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    status: Mapped[TaskStatus] = mapped_column(
+        SQLEnum(
+            TaskStatus, 
+            native_enum=False,
+            values_callable=lambda enum: [item.value for item in enum],
+            length=30
+        ), 
+        default=TaskStatus.TODO, nullable=False
+    )
+    priority: Mapped[TaskPriority] = mapped_column(
+        SQLEnum(
+            TaskPriority,
+            native_enum=False,
+            values_callable=lambda enum: [item.value for item in enum],
+            length=20
+        ),
+        default=TaskPriority.LOW,
+        nullable=False
+    )
     assigned_to_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), default=None)
-    submanagement_id: Mapped[int | None] = mapped_column(ForeignKey("submanagements.id"), default=None)
+    submanagement_id: Mapped[int | None] = mapped_column(ForeignKey("submanagements.id"), default=None) 
     team_id: Mapped[int | None] = mapped_column(ForeignKey("teams.id"), default=None)
     description: Mapped[str | None] = mapped_column(Text, default=None)
     due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
