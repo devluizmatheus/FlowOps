@@ -14,7 +14,7 @@ from flowops.security import (
 router = APIRouter(prefix='/users', tags=['users'])
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UsersPublicSchema)
-def CreateUser(user: UsersCreateSchema, session: Session = Depends(get_session)):
+def UserCreate(user: UsersCreateSchema, session: Session = Depends(get_session)):
 
     hashed_password = get_password_hash(user.password)
 

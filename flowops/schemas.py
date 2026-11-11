@@ -73,7 +73,7 @@ class TeamsPublicSchema(TeamsSchema):
 class UsersSchema(BaseModel):
     name: str
     email: EmailStr
-
+    icon: str
 
     role_id: int
     organization_id: int | None = None # Service para verificar se a role dele é admin
