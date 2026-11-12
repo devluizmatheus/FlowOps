@@ -12,7 +12,7 @@ from flowops.schemas import OrganizationSchema, OrganizationPublicSchema
 router = APIRouter(prefix='/organizations', tags=['organizations'])
 
 
-@router.get('/', response_model=list[OrganizationPublicSchema])
+@router.get('/list', response_model=list[OrganizationPublicSchema])
 def OrganizationsList(session: Session=Depends(get_session)):
     db_organizations = session.execute(select(Organizations)).scalars().all()
     return db_organizations
@@ -32,7 +32,7 @@ def OrganizationCreate(organizations: OrganizationSchema, session: Session=Depen
     return db_organization
 
 
-@router.put('/{organization_id}', status_code=HTTPStatus.OK, response_model=OrganizationPublicSchema)
+@router.put('update/{organization_id}', status_code=HTTPStatus.OK, response_model=OrganizationPublicSchema)
 def OrganizationUpdate(organization_id: int, organization: OrganizationSchema, session: Session = Depends(get_session)):
     db_organization = session.scalar(
         select(Organizations).where(Organizations.id == organization_id)
@@ -59,7 +59,7 @@ def OrganizationGet(organization_id: int, session: Session=Depends(get_session))
     
     if db_organization is None:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND ,
+            status_code=HTTPStatus.NOT_FOUND,
             detail='Organização não encontrada'
         )
 
@@ -71,8 +71,8 @@ def OrganizationDelete(organization_id: int, session: Session=Depends(get_sessio
     db_organization = session.scalar(select(Organizations).where(Organizations.id == organization_id))
 
     if db_organization is None:
-        raise HTTException(
-            status_ccode=HTTStatus.NOT_FOUND,
+        raise HTTPException(
+            status_code=HTTStatus.NOT_FOUND,
             detail="Organização não encontrada"
         )
 
