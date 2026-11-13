@@ -103,7 +103,7 @@ class Users(TimestampMixin, ActiveMixin):
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    icon: Mapped[str | None] = mapped_column(String(255), default=None)
+    icon: Mapped[str | None] = mapped_column(String(200), default=None)
     organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"), default=None)
     management_id: Mapped[int | None] = mapped_column(ForeignKey("managements.id"), default=None)
     submanagement_id: Mapped[int | None] = mapped_column(ForeignKey("submanagements.id"), default=None)

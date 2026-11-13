@@ -7,4 +7,4 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    DATABASE_URL: str = Field(init=False, env="DATABASE_URL")
+    DATABASE_URL: str

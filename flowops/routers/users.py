@@ -13,7 +13,13 @@ from flowops.security import (
 
 router = APIRouter(prefix='/users', tags=['users'])
 
-@router.post('/', status_code=HTTPStatus.CREATED, response_model=UsersPublicSchema)
+@router.post('/', response_model=list[UserPublicSchema])
+def UserList(session: Session=Depends(get_session))
+    db_user = session.execute(select(User)).scalars().all()
+    return db_user
+
+
+@router.post('/create', status_code=HTTPStatus.CREATED, response_model=UsersPublicSchema)
 def UserCreate(user: UsersCreateSchema, session: Session = Depends(get_session)):
 
     hashed_password = get_password_hash(user.password)
@@ -21,7 +27,7 @@ def UserCreate(user: UsersCreateSchema, session: Session = Depends(get_session))
     db_user = User(
         name=user.name,
         email=user.email,
-        password=hashed_password,
+        password_hash=hashed_password,
         role_id=user.role_id,
         icon=user.icon,
         organization_id=user.organization_id,
@@ -37,8 +43,5 @@ def UserCreate(user: UsersCreateSchema, session: Session = Depends(get_session))
     return db_user
 
 
-@router.get('/users', response_model=list[UsersPublicSchema])
-def UserList(session: Session = Depends(get_session)):
-    users = session.execute(select(User)).scalars().all()
-    return users
+
 
